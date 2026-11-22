@@ -136,6 +136,14 @@ export default function Layout() {
               <p className="text-xs capitalize text-slate-400">{user?.role}</p>
             </div>
             <Avatar name={user?.name} />
+            <button
+              onClick={handleLogout}
+              className="rounded-lg p-2 text-slate-500 transition hover:bg-red-50 hover:text-red-600"
+              title="Sign out"
+              aria-label="Sign out"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
           </div>
         </header>
 
