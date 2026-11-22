@@ -62,3 +62,62 @@
 .animate-fade-in {
   animation: fade-in 0.25s ease-out both;
 }
+
+/* ---------- Modern glassmorphic auth / landing styles ---------- */
+@layer components {
+  .glass {
+    @apply border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl;
+  }
+  .glass-soft {
+    @apply border border-white/10 bg-white/5 backdrop-blur-lg;
+  }
+  .glass-input {
+    @apply w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white shadow-inner outline-none transition placeholder:text-white/45 focus:border-white/50 focus:bg-white/15 focus:ring-2 focus:ring-white/20;
+  }
+  .glass-input-icon {
+    @apply pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50;
+  }
+  .btn-gradient {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/40 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-900/50 focus:outline-none focus:ring-2 focus:ring-white/40 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0;
+  }
+  .text-gradient {
+    @apply bg-gradient-to-r from-white via-indigo-100 to-violet-300 bg-clip-text text-transparent;
+  }
+}
+
+@keyframes blob {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(60px, -45px) scale(1.12); }
+  66%  { transform: translate(-45px, 55px) scale(0.92); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(129,140,248,0.4); }
+  70%  { box-shadow: 0 0 0 16px rgba(129,140,248,0); }
+  100% { box-shadow: 0 0 0 0 rgba(129,140,248,0); }
+}
+
+.animate-blob { animation: blob 20s infinite ease-in-out alternate; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-fade-up { animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-pulse-ring { animation: pulse-ring 2.4s infinite; }
+.shimmer-text {
+  background: linear-gradient(90deg, rgba(255,255,255,0.6) 0%, #ffffff 45%, rgba(255,255,255,0.6) 60%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 3.5s linear infinite;
+}
