@@ -70,14 +70,14 @@ export default function GroupDetail() {
 
   return (
     <>
-      <Link to="/groups" className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800">
+      <Link to="/groups" className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-white/50 transition hover:text-white">
         <ArrowLeft className="h-4 w-4" /> Back to groups
       </Link>
 
       <PageHeader
         title={group.name}
         subtitle={`Created by ${group.owner.name} · ${formatDate(group.createdAt)}`}
-        actions={<button className="btn-primary" onClick={() => setModalOpen(true)}><UserPlus className="h-4 w-4" /> Add member</button>}
+        actions={<button className="btn-primary btn-sm" onClick={() => setModalOpen(true)}><UserPlus className="h-4 w-4" /> Add member</button>}
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -88,38 +88,38 @@ export default function GroupDetail() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-5">
         <section className="card p-5 lg:col-span-2">
-          <h2 className="mb-4 font-semibold text-slate-900">Group progress</h2>
+          <h2 className="section-title mb-4">Group progress</h2>
           <ProgressBar value={group.progress.percent} showLabel size="lg" />
-          <p className="mt-3 text-sm text-slate-500">
+          <p className="mt-3 text-sm text-white/50">
             {group.progress.completed} of {group.progress.total} assigned assignments confirmed.
           </p>
         </section>
 
         <section className="card overflow-hidden lg:col-span-3">
-          <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-            <h2 className="font-semibold text-slate-900">Members</h2>
+          <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+            <h2 className="section-title">Members</h2>
             <Badge tone="slate">{group.members.length} people</Badge>
           </div>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-white/[0.07]">
             {group.members.map((m) => (
               <li key={m.id} className="flex items-center gap-3 px-5 py-3">
                 <Avatar name={m.name} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-800">
+                  <p className="truncate text-sm font-semibold text-white/90">
                     {m.name} {m.id === group.owner.id && <Badge tone="brand">Owner</Badge>}
-                    {m.id === user?.id && <span className="ml-1 text-xs text-slate-400">(you)</span>}
+                    {m.id === user?.id && <span className="ml-1 text-xs text-white/35">(you)</span>}
                   </p>
-                  <p className="truncate text-xs text-slate-500">{m.email}{m.studentId ? ` · ${m.studentId}` : ''}</p>
+                  <p className="truncate text-xs text-white/45">{m.email}{m.studentId ? ` · ${m.studentId}` : ''}</p>
                 </div>
-                {(isOwner && m.id !== user.id) || (!isOwner && m.id === user.id) ? (
+                {((isOwner && m.id !== user.id) || (!isOwner && m.id === user.id)) && (
                   <button
                     onClick={() => removeMember(m.id, m.name)}
-                    className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                    className="rounded-lg p-2 text-white/40 transition hover:bg-red-500/10 hover:text-red-200"
                     title={m.id === user.id ? 'Leave group' : 'Remove member'}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
-                ) : null}
+                )}
               </li>
             ))}
           </ul>
@@ -127,21 +127,21 @@ export default function GroupDetail() {
       </div>
 
       <section className="card mt-6 overflow-hidden">
-        <div className="border-b border-slate-200 px-5 py-4">
-          <h2 className="font-semibold text-slate-900">Assigned work & status</h2>
+        <div className="border-b border-white/10 px-5 py-4">
+          <h2 className="section-title">Assigned work and status</h2>
         </div>
         {targeted.length === 0 ? (
-          <p className="px-5 py-10 text-center text-sm text-slate-400">No assignments target this group yet.</p>
+          <p className="px-5 py-10 text-center text-sm text-white/40">No assignments target this group yet.</p>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-white/[0.07]">
             {targeted.map((a) => {
               const mine = (a.myGroups || []).find((g) => g.groupId === Number(id));
               const done = Boolean(mine?.submitted);
               return (
                 <div key={a.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
                   <div className="min-w-0">
-                    <p className="font-medium text-slate-800">{a.title}</p>
-                    <p className="text-xs text-slate-400">Due {formatDate(a.dueDate)}</p>
+                    <p className="font-medium text-white/90">{a.title}</p>
+                    <p className="text-xs text-white/35">Due {formatDate(a.dueDate)}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge tone={done ? 'green' : 'amber'}>
@@ -174,11 +174,11 @@ export default function GroupDetail() {
       >
         <form onSubmit={addMember}>
           <Alert message={formError} />
-          <div className="mb-4 flex gap-2 rounded-lg bg-slate-100 p-1">
-            <button type="button" onClick={() => { setMode('email'); setValue(''); }} className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-medium ${mode === 'email' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500'}`}>
+          <div className="mb-4 flex gap-2 rounded-xl bg-white/[0.06] p-1">
+            <button type="button" onClick={() => { setMode('email'); setValue(''); }} className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium transition ${mode === 'email' ? 'bg-white/15 text-white' : 'text-white/50 hover:text-white'}`}>
               <Mail className="h-4 w-4" /> Email
             </button>
-            <button type="button" onClick={() => { setMode('studentId'); setValue(''); }} className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-medium ${mode === 'studentId' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500'}`}>
+            <button type="button" onClick={() => { setMode('studentId'); setValue(''); }} className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium transition ${mode === 'studentId' ? 'bg-white/15 text-white' : 'text-white/50 hover:text-white'}`}>
               <Contact className="h-4 w-4" /> Student ID
             </button>
           </div>
@@ -192,7 +192,7 @@ export default function GroupDetail() {
               required
             />
           </Field>
-          <p className="mt-3 text-xs text-slate-500">The student must already have an account registered on SGAMS.</p>
+          <p className="mt-3 text-sm text-white/45">The student must already have an account on SGAMS.</p>
         </form>
       </Modal>
     </>

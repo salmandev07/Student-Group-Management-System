@@ -11,6 +11,7 @@ import {
   X,
   ChevronRight,
 } from 'lucide-react';
+import { AnimatedBackground } from './Animated';
 import { useAuth } from '../context/AuthContext';
 import { Avatar } from './UI';
 
@@ -42,115 +43,114 @@ export default function Layout() {
     navigate('/login', { replace: true });
   };
 
-  const NavItems = () => (
-    <nav className="space-y-1">
-      {nav.map(({ to, label, icon: Icon }) => (
-        <NavLink
-          key={to}
-          to={to}
-          onClick={() => setSidebarOpen(false)}
-          className={({ isActive }) =>
-            `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-              isActive
-                ? 'bg-brand-50 text-brand-700'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-            }`
-          }
-        >
-          <Icon className="h-5 w-5" />
-          {label}
-        </NavLink>
-      ))}
-    </nav>
-  );
-
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Sidebar */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-      <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform duration-200 lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <div className="flex h-16 items-center justify-between border-b border-slate-200 px-5">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <GraduationCap className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm font-bold leading-tight text-slate-900">SGAMS</p>
-              <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400">Joineazy</p>
-            </div>
-          </div>
-          <button className="lg:hidden" onClick={() => setSidebarOpen(false)} aria-label="Close menu">
-            <X className="h-5 w-5 text-slate-500" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-3 py-5">
-          <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            {isAdmin ? 'Professor panel' : 'Student panel'}
-          </p>
-          <NavItems />
-        </div>
-
-        <div className="border-t border-slate-200 p-3">
-          <button
-            onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
-          >
-            <LogOut className="h-5 w-5" />
-            Sign out
-          </button>
-        </div>
-      </aside>
-
-      {/* Main area */}
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/90 px-4 backdrop-blur sm:px-6">
-          <div className="flex items-center gap-3">
-            <button
-              className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
-              onClick={() => setSidebarOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu className="h-5 w-5" />
+    <>
+      <AnimatedBackground />
+      <div className="min-h-screen">
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-[#050814]/70 backdrop-blur-sm lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+        <aside
+          className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-white/10 bg-[#0b1026]/85 backdrop-blur-2xl transition-transform duration-300 lg:translate-x-0 ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <div className="flex h-16 items-center justify-between border-b border-white/10 px-5">
+            <button onClick={() => navigate('/')} className="flex items-center gap-2.5 text-left">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-950/50">
+                <GraduationCap className="h-5 w-5" />
+              </span>
+              <span>
+                <span className="block text-sm font-bold leading-tight text-white">SGAMS</span>
+                <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">Joineazy</span>
+              </span>
             </button>
-            <div className="hidden items-center gap-1.5 text-sm text-slate-400 sm:flex">
-              <span>SGAMS</span>
-              <ChevronRight className="h-4 w-4" />
-              <span className="font-medium text-slate-700">{current?.label || 'Home'}</span>
-            </div>
+            <button className="rounded-lg p-1.5 text-white/50 hover:bg-white/10 hover:text-white lg:hidden" onClick={() => setSidebarOpen(false)} aria-label="Close menu">
+              <X className="h-5 w-5" />
+            </button>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold text-slate-800">{user?.name}</p>
-              <p className="text-xs capitalize text-slate-400">{user?.role}</p>
-            </div>
-            <Avatar name={user?.name} />
+          <div className="flex-1 overflow-y-auto px-3 py-6">
+            <p className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
+              {isAdmin ? 'Professor workspace' : 'Student workspace'}
+            </p>
+            <nav className="space-y-1.5">
+              {nav.map(({ to, label, icon: Icon }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  onClick={() => setSidebarOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition duration-200 ${
+                      isActive
+                        ? 'bg-indigo-500/15 text-white ring-1 ring-inset ring-indigo-400/20 shadow-lg shadow-indigo-950/20'
+                        : 'text-white/55 hover:bg-white/[0.07] hover:text-white'
+                    }`
+                  }
+                >
+                  <Icon className="h-5 w-5" />
+                  {label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+
+          <div className="border-t border-white/10 p-3">
             <button
               onClick={handleLogout}
-              className="rounded-lg p-2 text-slate-500 transition hover:bg-red-50 hover:text-red-600"
-              title="Sign out"
-              aria-label="Sign out"
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/55 transition hover:bg-red-500/10 hover:text-red-200"
             >
               <LogOut className="h-5 w-5" />
+              Sign out
             </button>
           </div>
-        </header>
+        </aside>
 
-        <main className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
-          <Outlet />
-        </main>
+        <div className="lg:pl-64">
+          <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-white/10 bg-[#0b1026]/65 px-4 backdrop-blur-2xl sm:px-6">
+            <div className="flex items-center gap-3">
+              <button
+                className="rounded-lg p-2 text-white/70 transition hover:bg-white/10 hover:text-white lg:hidden"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open menu"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+              <div className="hidden items-center gap-1.5 text-sm text-white/40 sm:flex">
+                <span>SGAMS</span>
+                <ChevronRight className="h-4 w-4" />
+                <span className="font-medium text-white/85">{current?.label || 'Home'}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="hidden text-right sm:block">
+                <p className="text-sm font-semibold text-white">{user?.name}</p>
+                <p className="text-xs capitalize text-white/40">{user?.role}</p>
+              </div>
+              <Avatar name={user?.name} />
+              <button
+                onClick={handleLogout}
+                className="rounded-lg p-2 text-white/50 transition hover:bg-red-500/10 hover:text-red-200"
+                title="Sign out"
+                aria-label="Sign out"
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
+            </div>
+          </header>
+
+          <main className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
+            <div key={location.pathname} className="animate-fade-up">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

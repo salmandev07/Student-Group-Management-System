@@ -70,7 +70,7 @@ export default function Login() {
 
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-white/80 backdrop-blur-xl">
               <Sparkles className="h-3.5 w-3.5 text-violet-300" />
-              The new way student teams work
+              Student group assignment management
             </div>
 
             <h1 className="text-5xl font-extrabold leading-[1.08] tracking-tight xl:text-6xl">
@@ -95,21 +95,9 @@ export default function Login() {
               ))}
             </div>
 
-            <div className="mt-12 flex items-center gap-4">
-              <div className="flex -space-x-3">
-                {['AJ', 'BS', 'CB', 'DP'].map((a, i) => (
-                  <span
-                    key={a}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/20 text-xs font-bold text-white"
-                    style={{ background: ['#6366f1', '#a855f7', '#0ea5e9', '#10b981'][i] }}
-                  >
-                    {a}
-                  </span>
-                ))}
-              </div>
-              <p className="text-sm text-white/60">
-                <strong className="text-white">500+ teams</strong> already collaborating
-              </p>
+            <div className="mt-12 flex items-center gap-3 border-t border-white/10 pt-6 text-sm text-white/45">
+              <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+              Demo accounts are pre-filled so you can try either role.
             </div>
           </div>
 

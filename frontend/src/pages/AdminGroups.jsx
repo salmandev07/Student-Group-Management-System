@@ -23,21 +23,21 @@ export default function AdminGroups() {
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {groups.map((g) => (
-            <div key={g.id} className="card p-5">
+            <div key={g.id} className="card p-5 transition duration-300 hover:-translate-y-1 hover:border-white/20">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-semibold text-slate-900">{g.name}</h3>
-                  <p className="text-xs text-slate-400">Led by {g.ownerName} · {formatDate(g.createdAt)}</p>
+                  <h3 className="font-semibold text-white">{g.name}</h3>
+                  <p className="text-xs text-white/35">Led by {g.ownerName} · {formatDate(g.createdAt)}</p>
                 </div>
                 <Badge tone="brand" icon={UserPlus}>{g.memberCount}</Badge>
               </div>
               <div className="mt-5">
                 <div className="mb-2 flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-600">Completion</span>
-                  <span className="font-semibold text-slate-700">{g.progress?.percent || 0}%</span>
+                  <span className="font-semibold text-white/50">Completion</span>
+                  <span className="font-semibold text-white/85">{g.progress?.percent || 0}%</span>
                 </div>
-                <ProgressBar value={g.progress?.percent || 0} showLabel={false} />
-                <p className="mt-2 text-xs text-slate-400">
+                <ProgressBar value={g.progress?.percent || 0} />
+                <p className="mt-2 text-xs text-white/35">
                   {g.progress?.completed || 0}/{g.progress?.total || 0} assignments confirmed
                 </p>
               </div>

@@ -11,7 +11,7 @@ export default function Assignments() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
-  const [target, setTarget] = useState(null); // { assignment, group }
+  const [target, setTarget] = useState(null);
   const [step, setStep] = useState(1);
   const [ack, setAck] = useState(false);
   const [note, setNote] = useState('');
@@ -83,12 +83,12 @@ export default function Assignments() {
     <>
       <PageHeader
         title="Assignments"
-        subtitle="View your assignments, access OneDrive links, and confirm submissions."
+        subtitle="View assignments, open OneDrive links and confirm submissions."
       />
 
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
           <input
             className="input pl-10"
             placeholder="Search assignments..."
@@ -96,12 +96,12 @@ export default function Assignments() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex gap-1 rounded-lg bg-slate-100 p-1">
+        <div className="flex gap-1 rounded-xl border border-white/10 bg-white/[0.05] p-1">
           {['all', 'pending', 'submitted'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`flex-1 rounded-md px-4 py-2 text-sm font-medium capitalize transition sm:flex-none ${filter === f ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium capitalize transition sm:flex-none ${filter === f ? 'bg-white/15 text-white shadow-sm' : 'text-white/50 hover:text-white'}`}
             >
               {f}
             </button>
@@ -115,7 +115,7 @@ export default function Assignments() {
         <EmptyState
           icon={CalendarDays}
           title="No assignments found"
-          description={search || filter !== 'all' ? 'Try changing your search or filter.' : "Your professor hasn't posted any assignments for your groups yet."}
+          description={search || filter !== 'all' ? 'Try changing your search or filter.' : 'Your professor has not posted any assignments for your groups yet.'}
         />
       ) : (
         <div className="grid gap-5 xl:grid-cols-2">
@@ -124,11 +124,11 @@ export default function Assignments() {
             const allDone = mine.length > 0 && mine.every((g) => g.submitted);
             const days = daysUntil(a.dueDate);
             return (
-              <article key={a.id} className="card flex flex-col p-5">
+              <article key={a.id} className="card flex flex-col p-5 transition duration-300 hover:border-white/20">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h3 className="text-lg font-semibold text-slate-900">{a.title}</h3>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                    <h3 className="text-lg font-semibold text-white">{a.title}</h3>
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/45">
                       <span className="flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" /> Due {formatDate(a.dueDate)}</span>
                       <Badge tone={days !== null && days < 0 ? 'red' : days !== null && days <= 3 ? 'amber' : 'slate'}>
                         {days !== null && days < 0 ? 'Overdue' : days === 0 ? 'Due today' : `${days} days left`}
@@ -147,37 +147,37 @@ export default function Assignments() {
                   </a>
                 </div>
 
-                {a.description && <p className="mt-3 text-sm leading-relaxed text-slate-600">{a.description}</p>}
+                {a.description && <p className="mt-3 text-sm leading-relaxed text-white/60">{a.description}</p>}
 
-                <div className="mt-4 rounded-lg bg-slate-50 p-3">
+                <div className="mt-4 rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
                   <div className="mb-2 flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-600">Overall progress</span>
-                    <span className="font-semibold text-slate-700">{a.stats.submitted}/{a.stats.total} groups</span>
+                    <span className="font-semibold text-white/55">Overall progress</span>
+                    <span className="font-semibold text-white/80">{a.stats.submitted}/{a.stats.total} groups</span>
                   </div>
                   <ProgressBar value={a.stats.percent} size="sm" />
                 </div>
 
                 <div className="mt-4 flex-1">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Your groups</p>
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/35">Your groups</p>
                   <div className="space-y-2">
-                    {mine.length === 0 && <p className="text-sm text-slate-400">This assignment isn't assigned to your groups.</p>}
+                    {mine.length === 0 && <p className="text-sm text-white/40">This assignment is not assigned to your groups.</p>}
                     {mine.map((g) => (
-                      <div key={g.groupId} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 px-3 py-2.5">
+                      <div key={g.groupId} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
                         <div className="flex items-center gap-2">
                           {g.submitted ? (
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                           ) : (
-                            <Clock className="h-4 w-4 text-amber-500" />
+                            <Clock className="h-4 w-4 text-amber-400" />
                           )}
                           <div>
-                            <p className="text-sm font-medium text-slate-800">{g.groupName}</p>
+                            <p className="text-sm font-medium text-white/90">{g.groupName}</p>
                             {g.submitted && (
-                              <p className="text-[11px] text-slate-400">Confirmed by {g.confirmedBy} · {formatDate(g.confirmedAt)}</p>
+                              <p className="text-[11px] text-white/35">Confirmed by {g.confirmedBy} · {formatDate(g.confirmedAt)}</p>
                             )}
                           </div>
                         </div>
                         {g.submitted ? (
-                          <button onClick={() => withdraw(a, g)} className="btn-ghost px-2 py-1.5 text-xs text-slate-500">
+                          <button onClick={() => withdraw(a, g)} className="btn-ghost px-2 py-1.5 text-xs text-white/55">
                             <Undo2 className="h-3.5 w-3.5" /> Withdraw
                           </button>
                         ) : (
@@ -195,7 +195,6 @@ export default function Assignments() {
         </div>
       )}
 
-      {/* Two-step confirmation modal */}
       <Modal
         open={Boolean(target)}
         onClose={closeModal}
@@ -221,43 +220,42 @@ export default function Assignments() {
         <Alert message={actionError} />
         {target && (
           <div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <p className="text-sm font-semibold text-slate-800">{target.assignment.title}</p>
-              <p className="mt-1 text-xs text-slate-500">Group: <strong className="text-slate-700">{target.group.groupName}</strong></p>
-              <a href={target.assignment.oneDriveLink} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:underline">
+            <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="text-sm font-semibold text-white">{target.assignment.title}</p>
+              <p className="mt-1 text-xs text-white/50">Group: <strong className="text-white/80">{target.group.groupName}</strong></p>
+              <a href={target.assignment.oneDriveLink} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-indigo-300 hover:text-indigo-200">
                 <ExternalLink className="h-3.5 w-3.5" /> Open OneDrive link
               </a>
             </div>
 
             {step === 1 ? (
               <div className="mt-5">
-                <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
-                  <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
-                  <p className="text-sm text-amber-800">
-                    Only confirm after your group has actually uploaded the work to the OneDrive link above.
-                    Your professor will be notified immediately.
+                <div className="flex items-start gap-3 rounded-xl border border-amber-400/20 bg-amber-500/10 p-4">
+                  <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-300" />
+                  <p className="text-sm text-amber-100">
+                    Only confirm after your group has uploaded the work to the OneDrive link above. Your professor will see the confirmation immediately.
                   </p>
                 </div>
-                <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 hover:bg-slate-50">
+                <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 p-4 transition hover:bg-white/[0.05]">
                   <input
                     type="checkbox"
                     checked={ack}
                     onChange={(e) => setAck(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                    className="mt-0.5 h-4 w-4 rounded border-white/20 bg-white/10 text-indigo-500 focus:ring-indigo-400"
                   />
-                  <span className="text-sm text-slate-700">
+                  <span className="text-sm text-white/75">
                     I confirm that my group has uploaded the assignment to OneDrive and I am ready to submit.
                   </span>
                 </label>
               </div>
             ) : (
               <div className="mt-5 space-y-4">
-                <div className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                  <p className="text-sm text-emerald-800">Everything looks good. Click <strong>Final confirm</strong> to record the submission.</p>
+                <div className="flex items-center gap-3 rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-4">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-300" />
+                  <p className="text-sm text-emerald-100">Everything looks good. Click <strong>Final confirm</strong> to record the submission.</p>
                 </div>
                 <div>
-                  <label className="label">Note for the professor <span className="font-normal text-slate-400">(optional)</span></label>
+                  <label className="label">Note for the professor <span className="font-normal normal-case tracking-normal text-white/35">(optional)</span></label>
                   <textarea
                     className="input min-h-[80px] resize-y"
                     placeholder="e.g. Uploaded the final PDF and diagrams."

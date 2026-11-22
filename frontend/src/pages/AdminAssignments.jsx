@@ -92,7 +92,7 @@ export default function AdminAssignments() {
       <PageHeader
         title="Assignments"
         subtitle="Create, edit and monitor assignments for your students."
-        actions={<button className="btn-primary" onClick={openCreate}><Plus className="h-4 w-4" /> New assignment</button>}
+        actions={<button className="btn-primary btn-sm" onClick={openCreate}><Plus className="h-4 w-4" /> New assignment</button>}
       />
 
       <Alert message={error} onClose={() => setError('')} />
@@ -107,40 +107,40 @@ export default function AdminAssignments() {
       ) : (
         <div className="space-y-4">
           {assignments.map((a) => (
-            <article key={a.id} className="card p-5">
+            <article key={a.id} className="card p-5 transition duration-300 hover:border-white/20">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-semibold text-slate-900">{a.title}</h3>
+                    <h3 className="text-lg font-semibold text-white">{a.title}</h3>
                     <Badge tone={a.targetType === 'all' ? 'brand' : 'violet'}>
                       {a.targetType === 'all' ? 'All students' : `${a.targetGroups.length} group(s)`}
                     </Badge>
                   </div>
-                  <p className="mt-1.5 text-sm text-slate-600">{a.description || 'No description provided.'}</p>
-                  <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                  <p className="mt-1.5 text-sm text-white/60">{a.description || 'No description provided.'}</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-white/45">
                     <span className="flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" /> Due {formatDate(a.dueDate)}</span>
-                    <a href={a.oneDriveLink} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-semibold text-brand-600 hover:underline">
+                    <a href={a.oneDriveLink} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-semibold text-indigo-300 hover:text-indigo-200">
                       <ExternalLink className="h-3.5 w-3.5" /> OneDrive link
                     </a>
                     {a.createdBy && <span>Posted by {a.createdBy.name}</span>}
                   </div>
                 </div>
                 <div className="flex flex-shrink-0 gap-2">
-                  <button className="btn-secondary px-3 py-2" onClick={() => openEdit(a)}><Pencil className="h-4 w-4" /> Edit</button>
-                  <button className="btn-ghost px-3 py-2 text-red-500 hover:bg-red-50" onClick={() => remove(a)}><Trash2 className="h-4 w-4" /></button>
+                  <button className="btn-secondary btn-sm" onClick={() => openEdit(a)}><Pencil className="h-4 w-4" /> Edit</button>
+                  <button className="btn-ghost p-2 text-red-300 hover:bg-red-500/10" onClick={() => remove(a)}><Trash2 className="h-4 w-4" /></button>
                 </div>
               </div>
 
-              <div className="mt-4 grid gap-4 border-t border-slate-100 pt-4 sm:grid-cols-3">
+              <div className="mt-4 grid gap-4 border-t border-white/[0.08] pt-4 sm:grid-cols-3">
                 <div className="sm:col-span-2">
                   <div className="mb-1.5 flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-1 font-semibold text-slate-600"><BarChart3 className="h-3.5 w-3.5" /> Submission progress</span>
-                    <span className="font-semibold text-slate-700">{a.stats.submitted}/{a.stats.total} · {a.stats.percent}%</span>
+                    <span className="flex items-center gap-1 font-semibold text-white/55"><BarChart3 className="h-3.5 w-3.5" /> Submission progress</span>
+                    <span className="font-semibold text-white/80">{a.stats.submitted}/{a.stats.total} · {a.stats.percent}%</span>
                   </div>
                   <ProgressBar value={a.stats.percent} size="sm" />
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <Users className="h-4 w-4 text-slate-400" />
+                  <Users className="h-4 w-4 text-white/35" />
                   {a.targetType === 'all' ? (
                     <Badge tone="slate">All groups</Badge>
                   ) : (
@@ -190,7 +190,7 @@ export default function AdminAssignments() {
                   key={t}
                   type="button"
                   onClick={() => setForm({ ...form, targetType: t })}
-                  className={`flex-1 rounded-lg border px-3 py-2.5 text-sm font-medium transition ${form.targetType === t ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                  className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-medium transition ${form.targetType === t ? 'border-indigo-400/40 bg-indigo-500/15 text-white' : 'border-white/10 text-white/55 hover:bg-white/[0.06]'}`}
                 >
                   {t === 'all' ? 'All students' : 'Specific groups'}
                 </button>
@@ -199,18 +199,18 @@ export default function AdminAssignments() {
           </Field>
           {form.targetType === 'groups' && (
             <Field label="Select groups" hint="Choose one or more groups for this assignment.">
-              <div className="max-h-40 space-y-2 overflow-y-auto rounded-lg border border-slate-200 p-3">
-                {groups.length === 0 && <p className="text-sm text-slate-400">No groups have been created yet.</p>}
+              <div className="max-h-40 space-y-2 overflow-y-auto rounded-xl border border-white/10 p-3">
+                {groups.length === 0 && <p className="text-sm text-white/40">No groups have been created yet.</p>}
                 {groups.map((g) => (
-                  <label key={g.id} className="flex cursor-pointer items-center gap-2.5 rounded-md p-1.5 hover:bg-slate-50">
+                  <label key={g.id} className="flex cursor-pointer items-center gap-2.5 rounded-md p-1.5 transition hover:bg-white/[0.05]">
                     <input
                       type="checkbox"
                       checked={form.groupIds.includes(g.id)}
                       onChange={() => toggleGroup(g.id)}
-                      className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                      className="h-4 w-4 rounded border-white/20 bg-white/10 text-indigo-500 focus:ring-indigo-400"
                     />
-                    <span className="text-sm text-slate-700">{g.name}</span>
-                    <span className="text-xs text-slate-400">({g.memberCount} members)</span>
+                    <span className="text-sm text-white/80">{g.name}</span>
+                    <span className="text-xs text-white/35">({g.memberCount} members)</span>
                   </label>
                 ))}
               </div>

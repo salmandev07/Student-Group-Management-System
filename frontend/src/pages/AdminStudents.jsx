@@ -24,7 +24,7 @@ export default function AdminStudents() {
         <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <thead className="bg-white/[0.04] text-xs uppercase tracking-wider text-white/40">
                 <tr>
                   <th className="px-5 py-3 font-semibold">Student</th>
                   <th className="px-5 py-3 font-semibold">Student ID</th>
@@ -33,22 +33,22 @@ export default function AdminStudents() {
                   <th className="px-5 py-3 font-semibold">Joined</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-white/[0.07]">
                 {students.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-50">
+                  <tr key={s.id} className="transition hover:bg-white/[0.04]">
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
                         <Avatar name={s.name} size="sm" />
                         <div>
-                          <p className="font-medium text-slate-800">{s.name}</p>
-                          <p className="text-xs text-slate-400">{s.email}</p>
+                          <p className="font-medium text-white/90">{s.name}</p>
+                          <p className="text-xs text-white/40">{s.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-3 text-slate-600">{s.studentId || '—'}</td>
-                    <td className="px-5 py-3 text-slate-600">{s.groupCount}</td>
-                    <td className="px-5 py-3 text-slate-600">{s.submissionCount}</td>
-                    <td className="px-5 py-3 text-xs text-slate-500">{formatDate(s.createdAt)}</td>
+                    <td className="px-5 py-3 text-white/60">{s.studentId || '—'}</td>
+                    <td className="px-5 py-3 text-white/60">{s.groupCount}</td>
+                    <td className="px-5 py-3 text-white/60">{s.submissionCount}</td>
+                    <td className="px-5 py-3 text-xs text-white/45">{formatDate(s.createdAt)}</td>
                   </tr>
                 ))}
               </tbody>
