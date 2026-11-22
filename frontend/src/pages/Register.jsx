@@ -32,7 +32,7 @@ export default function Register() {
         studentId: form.studentId || undefined,
         password: form.password,
       });
-      navigate('/dashboard', { replace: true });
+      navigate('/student/dashboard', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {

@@ -4,6 +4,16 @@ A role-based full-stack web application built for **Joineazy** that lets student
 groups, manage members, and confirm assignment submissions — while professors post assignments,
 share OneDrive links, and track every group's progress through a unified dashboard.
 
+## 🔑 Demo Accounts — log in immediately
+
+| Role | Email | Password | Lands on |
+|---|---|---|---|
+| **Professor** (pre-seeded) | `professor@joineazy.com` | `Admin@123` | `/admin/dashboard` |
+| **Student** (pre-seeded) | `alice@student.com` | `password123` | `/student/dashboard` |
+
+Both roles use the **same login page**. The professor account is inserted automatically by the
+database seed script; public registration can only ever create students.
+
 ---
 
 ## 📑 Table of Contents
@@ -79,7 +89,7 @@ The database is seeded automatically on first boot with realistic demo data (2 g
 
 | Role | Email | Password |
 |---|---|---|
-| Professor | `professor@joineazy.com` | `admin123` |
+| Professor | `professor@joineazy.com` | `Admin@123` |
 | Student | `alice@student.com` | `password123` |
 | Student | `bob@student.com` | `password123` |
 | Student | `diana@student.com` | `password123` |
@@ -156,12 +166,20 @@ All protected routes require `Authorization: Bearer <JWT>`.
 ### Authentication — `/api/auth`
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| POST | `/register` | Public | Register. Body: `{ name, email, password, studentId?, role?, adminKey? }` |
-| POST | `/login` | Public | Body: `{ email, password }` → `{ token, user }` |
+| POST | `/register` | Public | Body: `{ name, email, password, studentId? }` — **always creates a student** |
+| POST | `/login` | Public | Body: `{ email, password }` → `{ token, user }`; the JWT contains `{ id, role }` |
+| POST | `/forgot-password` | Public | Body: `{ email }` → generates a single-use token (returned in the response for this demo) |
+| POST | `/reset-password` | Public | Body: `{ token, password }` — token valid 15 minutes, one use |
 | GET | `/me` | Auth | Current user profile |
 
-> Creating an **admin** account requires `role: "admin"` plus `adminKey` matching
-> `ADMIN_REGISTRATION_KEY` (default `joineazy-admin`). The public UI only registers students.
+**No admin self-registration.** `POST /api/auth/register` ignores any `role` field and always writes
+`role = 'student'`. The professor account is created by `backend/src/db/seed.js` on first boot with a
+bcrypt hash of `ADMIN_SEED_PASSWORD` (default `Admin@123`). After login the frontend reads `user.role`
+and routes admins to `/admin/dashboard` and students to `/student/dashboard`.
+
+> Password reset is token-based: `password_resets` stores only a SHA-256 hash of a random token, with a
+> 15-minute expiry and a `used_at` marker. Because there is no mail server in this demo, the token is
+> returned in the API response and shown on the forgot-password screen.
 
 ### Groups — `/api/groups`
 | Method | Endpoint | Access | Description |
@@ -236,6 +254,7 @@ erDiagram
     GROUPS ||--o{ ASSIGNMENT_GROUPS : "targeted by"
     ASSIGNMENTS ||--o{ SUBMISSIONS : "confirmed via"
     GROUPS ||--o{ SUBMISSIONS : "submitted by"
+    USERS ||--o{ PASSWORD_RESETS : "requests"
 
     USERS {
         serial id PK
@@ -281,6 +300,14 @@ erDiagram
         int confirmed_by FK
         text note
         timestamptz confirmed_at
+    }
+    PASSWORD_RESETS {
+        serial id PK
+        int user_id FK
+        varchar token_hash UK
+        timestamptz expires_at
+        timestamptz used_at
+        timestamptz created_at
     }
 ```
 
@@ -351,12 +378,14 @@ idempotent demo seed in [`backend/src/db/seed.js`](backend/src/db/seed.js).
 | Decision | Rationale |
 |---|---|
 | **Two-step confirmation at the API level** | `confirm: true` must be sent explicitly, so an accidental single click or a direct API call cannot record a submission. |
+| **No admin self-registration** | Public `/register` always writes `role = 'student'`, so a student cannot escalate privileges. The professor account is pre-seeded by `seed.js` with a bcrypt-hashed password. |
 | **Role checks on the server** | Hiding admin screens in React is not security; every admin route re-verifies the `admin` role from the JWT and DB. |
 | **Target model (`all` vs `groups`)** | Avoids duplicating rows for "everyone" while still allowing precise group targeting; visibility is computed in one helper. |
 | **Progress computed in SQL** | Aggregation (`COUNT DISTINCT`, `ANY(int[])`) keeps the client dumb and avoids N+1 request storms. |
 | **Centralized error envelope** | A consistent `{ success, message }` shape with proper status codes makes the frontend predictable. |
 | **Transactions for multi-step writes** | Creating an assignment + its group links, or a group + its first member, either fully commits or fully rolls back. |
 | **bcrypt (12 rounds) + JWT expiry** | Passwords are never stored in plaintext; tokens expire (`JWT_EXPIRES_IN`, default 7d). |
+| **Single-use reset tokens** | Forgot-password tokens are random, hashed at rest (SHA-256), expire after 15 minutes and are marked used after one reset. |
 | **Multi-stage frontend build + Nginx** | Small production image; Nginx serves the SPA, handles the React Router fallback (`try_files`) and proxies `/api` to the backend. |
 | **Compose healthcheck** | The backend waits for PostgreSQL to be genuinely ready before starting, avoiding startup races. |
 | **Volume for Postgres** | Submissions survive container restarts/rebuilds. |

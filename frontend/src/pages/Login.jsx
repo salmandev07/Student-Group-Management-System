@@ -10,7 +10,7 @@ import { Alert, Spinner } from '../components/UI';
 
 const DEMO = {
   student: { email: 'alice@student.com', password: 'password123' },
-  professor: { email: 'professor@joineazy.com', password: 'admin123' },
+  professor: { email: 'professor@joineazy.com', password: 'Admin@123' },
 };
 
 export default function Login() {
@@ -23,7 +23,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState(() => ({ ...DEMO[initialRole] }));
   const [error, setError] = useState('');
-  const [info, setInfo] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   if (isAuthenticated) return <Navigate to="/dashboard" replace />;
@@ -32,18 +31,16 @@ export default function Login() {
     setRole(next);
     setForm({ ...DEMO[next] });
     setError('');
-    setInfo('');
     setShowPassword(false);
   };
 
   const submit = async (e) => {
     e.preventDefault();
     setError('');
-    setInfo('');
     setSubmitting(true);
     try {
-      await login(form);
-      navigate('/dashboard', { replace: true });
+      const signedInUser = await login(form);
+      navigate(signedInUser.role === 'admin' ? '/admin/dashboard' : '/student/dashboard', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -97,7 +94,7 @@ export default function Login() {
 
             <div className="mt-12 flex items-center gap-3 border-t border-white/10 pt-6 text-sm text-white/45">
               <CheckCircle2 className="h-4 w-4 text-emerald-300" />
-              Demo accounts are pre-filled so you can try either role.
+              Professor account is pre-seeded. Students can register themselves.
             </div>
           </div>
 
@@ -140,8 +137,7 @@ export default function Login() {
                 ))}
               </div>
 
-              <Alert type="error" message={error} onClose={() => setError('')} className="[&_div]:border-white/20" />
-              <Alert type="info" message={info} onClose={() => setInfo('')} />
+              <Alert type="error" message={error} onClose={() => setError('')} />
 
               <form onSubmit={submit} className="space-y-5">
                 <div>
@@ -163,13 +159,12 @@ export default function Login() {
                 <div>
                   <div className="mb-2 flex items-center justify-between">
                     <label className="text-xs font-semibold uppercase tracking-wider text-white/60">Password</label>
-                    <button
-                      type="button"
-                      onClick={() => setInfo('Please contact your professor or administrator to reset your password.')}
+                    <Link
+                      to="/forgot-password"
                       className="text-xs font-medium text-indigo-300 transition hover:text-indigo-200"
                     >
                       Forgot password?
-                    </button>
+                    </Link>
                   </div>
                   <div className="relative">
                     <Lock className="glass-input-icon" />

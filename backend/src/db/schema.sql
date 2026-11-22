@@ -65,6 +65,16 @@ CREATE TABLE IF NOT EXISTS submissions (
   UNIQUE (assignment_id, group_id)
 );
 
+-- Single-use password reset tokens (15 minute lifetime, enforced in the API).
+CREATE TABLE IF NOT EXISTS password_resets (
+  id         SERIAL PRIMARY KEY,
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token_hash VARCHAR(64) NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  used_at    TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Helpful indexes for the dashboard queries.
 CREATE INDEX IF NOT EXISTS idx_group_members_user   ON group_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_group_members_group  ON group_members(group_id);
@@ -72,3 +82,4 @@ CREATE INDEX IF NOT EXISTS idx_assignment_groups_grp ON assignment_groups(group_
 CREATE INDEX IF NOT EXISTS idx_submissions_group    ON submissions(group_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_assignment ON submissions(assignment_id);
 CREATE INDEX IF NOT EXISTS idx_assignments_created_by ON assignments(created_by);
+CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets(user_id);

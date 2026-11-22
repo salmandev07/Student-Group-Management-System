@@ -1,9 +1,11 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import RoleRedirect from './components/RoleRedirect';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import Groups from './pages/Groups';
 import GroupDetail from './pages/GroupDetail';
@@ -16,22 +18,25 @@ import AdminStudents from './pages/AdminStudents';
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* Student + shared routes */}
-      <Route element={<ProtectedRoute />}>
+      {/* Student workspace */}
+      <Route element={<ProtectedRoute allowedRoles={['student']} />}>
         <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/student/dashboard" element={<Dashboard />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/groups/:id" element={<GroupDetail />} />
           <Route path="/assignments" element={<Assignments />} />
         </Route>
       </Route>
 
-      {/* Professor-only routes */}
+      {/* Professor workspace */}
       <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
         <Route element={<Layout />}>
+          <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/assignments" element={<AdminAssignments />} />
           <Route path="/admin/analytics" element={<AdminAnalytics />} />
           <Route path="/admin/groups" element={<AdminGroups />} />
@@ -39,8 +44,8 @@ export default function App() {
         </Route>
       </Route>
 
-      <Route path="/" element={<Landing />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={<RoleRedirect />} />
+      <Route path="*" element={<RoleRedirect />} />
     </Routes>
   );
 }

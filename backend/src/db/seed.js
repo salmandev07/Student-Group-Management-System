@@ -2,27 +2,41 @@ const { query } = require('../config/db');
 const { hashPassword } = require('../utils/password');
 const logger = require('../utils/logger');
 
+const ADMIN_EMAIL = 'professor@joineazy.com';
+const ADMIN_PASSWORD = process.env.ADMIN_SEED_PASSWORD || 'Admin@123';
+
 /**
  * Idempotent seed data for local development / demo.
- * Only inserts when the users table is empty.
+ * The professor account is created if missing; its password is never
+ * overwritten, so a password reset survives container restarts.
  */
 const seed = async () => {
+  const adminExists = await query('SELECT id FROM users WHERE email = $1', [ADMIN_EMAIL]);
+  let adminId;
+
+  if (adminExists.rows.length) {
+    adminId = adminExists.rows[0].id;
+    logger.info('Seed: professor account already present.');
+  } else {
+    const adminHash = await hashPassword(ADMIN_PASSWORD);
+    const admin = await query(
+      `INSERT INTO users (name, email, password_hash, role, student_id)
+       VALUES ($1, $2, $3, 'admin', NULL) RETURNING id`,
+      ['Dr. Sarah Professor', ADMIN_EMAIL, adminHash]
+    );
+    adminId = admin.rows[0].id;
+    logger.info(`Seed: professor account created (${ADMIN_EMAIL}).`);
+  }
+
   const existing = await query('SELECT COUNT(*)::int AS count FROM users');
-  if (existing.rows[0].count > 0) {
-    logger.info('Seed skipped - database already contains users.');
+  if (existing.rows[0].count > 1) {
+    logger.info('Seed skipped - demo students already exist.');
+    logger.info(`  Professor login: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
     return;
   }
 
-  logger.info('Seeding demo data...');
-
-  const adminHash = await hashPassword('admin123');
+  logger.info('Seeding demo students, groups and assignments...');
   const studentHash = await hashPassword('password123');
-
-  const admin = await query(
-    `INSERT INTO users (name, email, password_hash, role, student_id)
-     VALUES ($1, $2, $3, 'admin', NULL) RETURNING id`,
-    ['Dr. Sarah Professor', 'professor@joineazy.com', adminHash]
-  );
 
   const studentData = [
     ['Alice Johnson', 'alice@student.com', 'STU001'],
@@ -43,7 +57,6 @@ const seed = async () => {
     studentIds.push(r.rows[0].id);
   }
 
-  // Two demo groups.
   const g1 = await query(
     'INSERT INTO groups (name, created_by) VALUES ($1, $2) RETURNING id',
     ['The Alchemists', studentIds[0]]
@@ -62,10 +75,8 @@ const seed = async () => {
     await query('INSERT INTO group_members (group_id, user_id) VALUES ($1, $2)', [group2, uid]);
   }
 
-  const adminId = admin.rows[0].id;
   const onedrive = 'https://onedrive.live.com/';
 
-  // Assignment targeted at everyone.
   const a1 = await query(
     `INSERT INTO assignments (title, description, due_date, onedrive_link, target_type, created_by)
      VALUES ($1, $2, NOW() + INTERVAL '7 days', $3, 'all', $4) RETURNING id`,
@@ -77,7 +88,6 @@ const seed = async () => {
     ]
   );
 
-  // Assignment targeted at specific groups.
   const a2 = await query(
     `INSERT INTO assignments (title, description, due_date, onedrive_link, target_type, created_by)
      VALUES ($1, $2, NOW() + INTERVAL '14 days', $3, 'groups', $4) RETURNING id`,
@@ -93,7 +103,6 @@ const seed = async () => {
     group2,
   ]);
 
-  // One already-confirmed submission for demo analytics.
   await query(
     `INSERT INTO submissions (assignment_id, group_id, confirmed_by, note)
      VALUES ($1, $2, $3, 'Uploaded the final PDF to OneDrive.')`,
@@ -101,7 +110,7 @@ const seed = async () => {
   );
 
   logger.info('Seed complete.');
-  logger.info('  Admin login: professor@joineazy.com / admin123');
+  logger.info(`  Professor login: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
   logger.info('  Student login: alice@student.com / password123');
 };
 

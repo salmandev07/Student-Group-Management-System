@@ -3,6 +3,8 @@ import { request } from './client';
 export const authApi = {
   register: (data) => request('post', '/auth/register', data),
   login: (data) => request('post', '/auth/login', data),
+  forgotPassword: (data) => request('post', '/auth/forgot-password', data),
+  resetPassword: (data) => request('post', '/auth/reset-password', data),
   me: () => request('get', '/auth/me'),
 };
 

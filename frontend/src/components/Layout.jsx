@@ -16,13 +16,13 @@ import { useAuth } from '../context/AuthContext';
 import { Avatar } from './UI';
 
 const studentNav = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/student/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/groups', label: 'My Groups', icon: Users },
   { to: '/assignments', label: 'Assignments', icon: ClipboardList },
 ];
 
 const adminNav = [
-  { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { to: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard },
   { to: '/admin/assignments', label: 'Assignments', icon: ClipboardList },
   { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/admin/groups', label: 'Groups', icon: Users },
