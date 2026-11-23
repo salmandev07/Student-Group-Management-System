@@ -118,41 +118,22 @@ export default function Landing() {
 
                     <div className="grid grid-cols-3 gap-3">
                       {[
-                        { label: 'Groups', value: '2', icon: Users },
-                        { label: 'Assignments', value: '2', icon: ClipboardCheck },
-                        { label: 'Completion', value: '50%', icon: TrendingUp },
-                      ].map(({ label, value, icon: Icon }) => (
+                        { label: 'Groups', icon: Users },
+                        { label: 'Assignments', icon: ClipboardCheck },
+                        { label: 'Completion', icon: TrendingUp },
+                      ].map(({ label, icon: Icon }) => (
                         <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-3.5">
                           <Icon className="mb-2 h-4 w-4 text-indigo-300" />
-                          <p className="text-xl font-bold text-white">{value}</p>
+                          <p className="text-xl font-bold text-white/25">—</p>
                           <p className="text-[10px] uppercase tracking-wider text-white/40">{label}</p>
                         </div>
                       ))}
                     </div>
 
-                    <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <p className="mb-4 text-sm font-semibold text-white">Group progress</p>
-                      {[
-                        { name: 'The Alchemists', value: 100 },
-                        { name: 'Code Crusaders', value: 0 },
-                      ].map((row) => (
-                        <div key={row.name} className="mb-3 last:mb-0">
-                          <div className="mb-1.5 flex justify-between text-[11px]">
-                            <span className="text-white/70">{row.name}</span>
-                            <span className="font-semibold text-white">{row.value}%</span>
-                          </div>
-                          <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-                            <div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-fuchsia-400" style={{ width: `${row.value}%` }} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-4 flex items-center gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-3.5">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-400/20 text-emerald-300">
-                        <CheckCircle2 className="h-4 w-4" />
-                      </span>
-                      <p className="text-xs text-white/75">The Alchemists confirmed <strong className="text-white">Week 3 Report</strong></p>
+                    <div className="mt-4 flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-10 text-center">
+                      <BarChart3 className="mb-3 h-6 w-6 text-indigo-300" />
+                      <p className="text-sm font-medium text-white/70">Your workspace</p>
+                      <p className="mt-1 text-xs text-white/40">Sign in to see your groups and progress.</p>
                     </div>
                   </div>
                 </div>

@@ -4,15 +4,15 @@ A role-based full-stack web application built for **Joineazy** that lets student
 groups, manage members, and confirm assignment submissions — while professors post assignments,
 share OneDrive links, and track every group's progress through a unified dashboard.
 
-## 🔑 Demo Accounts — log in immediately
+## 🔑 Test Account — log in immediately
 
 | Role | Email | Password | Lands on |
 |---|---|---|---|
 | **Professor** (pre-seeded) | `professor@joineazy.com` | `Admin@123` | `/admin/dashboard` |
-| **Student** (pre-seeded) | `alice@student.com` | `password123` | `/student/dashboard` |
 
-Both roles use the **same login page**. The professor account is inserted automatically by the
-database seed script; public registration can only ever create students.
+Students create their own accounts with the registration form. Both roles use the **same login
+page**. The professor account is the only account inserted by the database seed script; public
+registration can only ever create students. There is no sample data.
 
 ---
 
@@ -21,7 +21,7 @@ database seed script; public registration can only ever create students.
 1. [Overview](#overview)
 2. [Tech Stack](#tech-stack)
 3. [Features](#features)
-4. [Demo Credentials](#demo-credentials)
+4. [Test Account](#test-account)
 5. [Setup & Run](#setup--run)
 6. [API Endpoints](#api-endpoints)
 7. [Database Schema](#database-schema)
@@ -82,19 +82,16 @@ on the server, not just hidden in the UI.
 
 ---
 
-## Demo Credentials
+## Test Account
 
-The database is seeded automatically on first boot with realistic demo data (2 groups, 6 students,
-2 assignments, 1 pre-confirmed submission).
+The seed script creates **only** the professor account on first boot:
 
 | Role | Email | Password |
 |---|---|---|
 | Professor | `professor@joineazy.com` | `Admin@123` |
-| Student | `alice@student.com` | `password123` |
-| Student | `bob@student.com` | `password123` |
-| Student | `diana@student.com` | `password123` |
 
-> The login page has one-click buttons that fill these credentials for you.
+Students register themselves through the sign-up page. No groups, assignments or submissions are
+pre-created; the app starts empty apart from the professor account.
 
 ---
 
@@ -118,7 +115,7 @@ docker compose up -d --build
 #    API:      http://localhost:5000/api/health
 ```
 
-The backend automatically applies the schema and seeds demo data on startup. PostgreSQL data is
+The backend automatically applies the schema and seeds the professor account on startup. PostgreSQL data is
 persisted in the `postgres_data` Docker volume. Stop with `docker compose down`.
 
 > When running in Docker, the frontend build uses `VITE_API_URL=/api` and Nginx proxies `/api/*` to
@@ -137,7 +134,7 @@ psql -c "CREATE DATABASE sgams OWNER sgams_user;"
 cd backend
 cp .env.example .env          # set DB_* and JWT_SECRET for your local DB
 npm install
-npm run db:init               # applies schema.sql + seeds demo data
+npm run db:init               # applies schema.sql + seeds the professor account
 npm run dev                   # http://localhost:5000
 
 # 3. Frontend (new terminal)
@@ -168,8 +165,8 @@ All protected routes require `Authorization: Bearer <JWT>`.
 |---|---|---|---|
 | POST | `/register` | Public | Body: `{ name, email, password, studentId? }` — **always creates a student** |
 | POST | `/login` | Public | Body: `{ email, password }` → `{ token, user }`; the JWT contains `{ id, role }` |
-| POST | `/forgot-password` | Public | Body: `{ email }` → generates a single-use token (returned in the response for this demo) |
-| POST | `/reset-password` | Public | Body: `{ token, password }` — token valid 15 minutes, one use |
+| POST | `/forgot-password` | Public | Body: `{ email }` → generates a 6-digit OTP (returned in the response for this demo) |
+| POST | `/reset-password` | Public | Body: `{ email, otp, password }` — OTP valid 10 minutes, one use, max 5 attempts |
 | GET | `/me` | Auth | Current user profile |
 
 **No admin self-registration.** `POST /api/auth/register` ignores any `role` field and always writes
@@ -177,9 +174,9 @@ All protected routes require `Authorization: Bearer <JWT>`.
 bcrypt hash of `ADMIN_SEED_PASSWORD` (default `Admin@123`). After login the frontend reads `user.role`
 and routes admins to `/admin/dashboard` and students to `/student/dashboard`.
 
-> Password reset is token-based: `password_resets` stores only a SHA-256 hash of a random token, with a
-> 15-minute expiry and a `used_at` marker. Because there is no mail server in this demo, the token is
-> returned in the API response and shown on the forgot-password screen.
+> Password recovery is **OTP-based**. `password_resets` stores only a SHA-256 hash of the 6-digit
+> code, with a 10-minute expiry, an attempt counter and a `used_at` marker. There is no mail server in
+> this demo, so the OTP is returned in the API response and displayed on the recovery screen.
 
 ### Groups — `/api/groups`
 | Method | Endpoint | Access | Description |
@@ -304,8 +301,9 @@ erDiagram
     PASSWORD_RESETS {
         serial id PK
         int user_id FK
-        varchar token_hash UK
+        varchar otp_hash
         timestamptz expires_at
+        int attempts
         timestamptz used_at
         timestamptz created_at
     }
@@ -324,7 +322,7 @@ erDiagram
 - Indexes on all foreign keys keep dashboard aggregation queries fast.
 
 The authoritative DDL lives in [`backend/src/db/schema.sql`](backend/src/db/schema.sql), and the
-idempotent demo seed in [`backend/src/db/seed.js`](backend/src/db/seed.js).
+idempotent seed in [`backend/src/db/seed.js`](backend/src/db/seed.js).
 
 ---
 
@@ -385,7 +383,7 @@ idempotent demo seed in [`backend/src/db/seed.js`](backend/src/db/seed.js).
 | **Centralized error envelope** | A consistent `{ success, message }` shape with proper status codes makes the frontend predictable. |
 | **Transactions for multi-step writes** | Creating an assignment + its group links, or a group + its first member, either fully commits or fully rolls back. |
 | **bcrypt (12 rounds) + JWT expiry** | Passwords are never stored in plaintext; tokens expire (`JWT_EXPIRES_IN`, default 7d). |
-| **Single-use reset tokens** | Forgot-password tokens are random, hashed at rest (SHA-256), expire after 15 minutes and are marked used after one reset. |
+| **Single-use OTP recovery** | Forgot-password codes are 6-digit, hashed at rest (SHA-256), expire after 10 minutes, are limited to 5 attempts and are marked used after one reset. |
 | **Multi-stage frontend build + Nginx** | Small production image; Nginx serves the SPA, handles the React Router fallback (`try_files`) and proxies `/api` to the backend. |
 | **Compose healthcheck** | The backend waits for PostgreSQL to be genuinely ready before starting, avoiding startup races. |
 | **Volume for Postgres** | Submissions survive container restarts/rebuilds. |

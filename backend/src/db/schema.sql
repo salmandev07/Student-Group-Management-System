@@ -65,13 +65,16 @@ CREATE TABLE IF NOT EXISTS submissions (
   UNIQUE (assignment_id, group_id)
 );
 
--- Single-use password reset tokens (15 minute lifetime, enforced in the API).
-CREATE TABLE IF NOT EXISTS password_resets (
+-- Single-use OTP codes for password recovery (short lifetime, enforced in the API).
+-- Rebuilt on startup so a schema change cannot leave an old token table behind.
+DROP TABLE IF EXISTS password_resets;
+CREATE TABLE password_resets (
   id         SERIAL PRIMARY KEY,
   user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  token_hash VARCHAR(64) NOT NULL UNIQUE,
+  otp_hash   VARCHAR(64) NOT NULL,
   expires_at TIMESTAMPTZ NOT NULL,
   used_at    TIMESTAMPTZ,
+  attempts   INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

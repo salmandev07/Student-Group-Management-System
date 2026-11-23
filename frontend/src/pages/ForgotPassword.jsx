@@ -7,23 +7,25 @@ import { Alert, Spinner } from '../components/UI';
 
 export default function ForgotPassword() {
   const [params] = useSearchParams();
-  const [step, setStep] = useState(params.get('token') ? 2 : 1);
-  const [email, setEmail] = useState('');
-  const [token, setToken] = useState(params.get('token') || '');
+  const [step, setStep] = useState(1);
+  const [email, setEmail] = useState(params.get('email') || '');
+  const [generatedOtp, setGeneratedOtp] = useState('');
+  const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const requestReset = async (e) => {
+  const requestOtp = async (e) => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
     try {
       const data = await authApi.forgotPassword({ email });
-      if (data.resetToken) {
-        setToken(data.resetToken);
+      if (data.otp) {
+        setGeneratedOtp(data.otp);
+        setOtp('');
         setStep(2);
       } else {
         setSuccess(data.message);
@@ -44,7 +46,7 @@ export default function ForgotPassword() {
     }
     setSubmitting(true);
     try {
-      const data = await authApi.resetPassword({ token, password });
+      const data = await authApi.resetPassword({ email, otp, password });
       setSuccess(data.message);
     } catch (err) {
       setError(err.message);
@@ -79,8 +81,8 @@ export default function ForgotPassword() {
                     {success
                       ? 'You can now sign in with your new password.'
                       : step === 1
-                        ? 'Enter your account email and we will generate a reset token.'
-                        : 'Enter the reset token and choose a new password.'}
+                        ? 'Enter your account email to receive a one-time code.'
+                        : 'Enter the code and your new password.'}
                   </p>
                 </div>
                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-white/10 text-white backdrop-blur">
@@ -96,7 +98,7 @@ export default function ForgotPassword() {
                   Go to sign in <ArrowRight className="h-4 w-4" />
                 </Link>
               ) : step === 1 ? (
-                <form onSubmit={requestReset} className="space-y-5">
+                <form onSubmit={requestOtp} className="space-y-5">
                   <div>
                     <label className="label">Account email</label>
                     <div className="relative">
@@ -104,7 +106,7 @@ export default function ForgotPassword() {
                       <input
                         type="email"
                         className="glass-input pl-11"
-                        placeholder="you@student.com or professor@joineazy.com"
+                        placeholder="Email address"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -112,29 +114,27 @@ export default function ForgotPassword() {
                     </div>
                   </div>
                   <button type="submit" className="btn-gradient w-full" disabled={submitting}>
-                    {submitting ? <Spinner /> : <>Generate reset token <ArrowRight className="h-4 w-4" /></>}
+                    {submitting ? <Spinner /> : <>Send OTP <ArrowRight className="h-4 w-4" /></>}
                   </button>
-                  <p className="text-center text-xs text-white/40">
-                    For this demo the token is shown on screen instead of being emailed.
-                  </p>
                 </form>
               ) : (
                 <form onSubmit={resetPassword} className="space-y-5">
-                  <div className="rounded-xl border border-indigo-400/20 bg-indigo-500/10 p-3.5">
-                    <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-200">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Reset token
-                    </div>
-                    <p className="break-all font-mono text-xs text-white/75">{token}</p>
+                  <div className="rounded-xl border border-indigo-400/20 bg-indigo-500/10 p-4 text-center">
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-indigo-200">One-time code</p>
+                    <p className="text-2xl font-bold tracking-[0.35em] text-white">{generatedOtp}</p>
                   </div>
                   <div>
-                    <label className="label">Reset token</label>
+                    <label className="label">Enter the 6-digit code</label>
                     <div className="relative">
                       <KeyRound className="glass-input-icon" />
                       <input
-                        className="glass-input pl-11 font-mono text-xs"
-                        placeholder="Paste your token"
-                        value={token}
-                        onChange={(e) => setToken(e.target.value)}
+                        inputMode="numeric"
+                        pattern="[0-9]{6}"
+                        maxLength={6}
+                        className="glass-input pl-11 tracking-[0.3em]"
+                        placeholder="000000"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                         required
                       />
                     </div>
@@ -147,7 +147,7 @@ export default function ForgotPassword() {
                         <input
                           type="password"
                           className="glass-input pl-11"
-                          placeholder="Min. 6 characters"
+                          placeholder="New password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           minLength={6}
@@ -162,7 +162,7 @@ export default function ForgotPassword() {
                         <input
                           type="password"
                           className="glass-input pl-11"
-                          placeholder="Repeat password"
+                          placeholder="Confirm password"
                           value={confirm}
                           onChange={(e) => setConfirm(e.target.value)}
                           minLength={6}

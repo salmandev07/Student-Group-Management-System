@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import {
   GraduationCap, User, Mail, Contact, Lock, ArrowLeft, Sparkles,
-  ShieldCheck, ArrowRight, CheckCircle2,
+  ArrowRight,
 } from 'lucide-react';
 import { AnimatedBackground } from '../components/Animated';
 import { useAuth } from '../context/AuthContext';
@@ -74,34 +74,29 @@ export default function Register() {
                 </div>
               </div>
 
-              <div className="mb-6 flex items-center gap-2 rounded-xl border border-indigo-400/25 bg-indigo-500/10 px-4 py-3 text-sm text-indigo-100">
-                <ShieldCheck className="h-4 w-4 flex-shrink-0" />
-                Student accounts are self-service. Professor accounts are issued by your institution.
-              </div>
-
               <Alert type="error" message={error} onClose={() => setError('')} />
 
               <form onSubmit={submit} className="space-y-4">
                 <div>
                   <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/60">Full name</label>
                   {field(User, {
-                    type: 'text', placeholder: 'Jane Doe', value: form.name,
+                    type: 'text', placeholder: 'Full name', value: form.name,
                     onChange: (e) => setForm({ ...form, name: e.target.value }), required: true,
                   })}
                 </div>
                 <div>
                   <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/60">Email address</label>
                   {field(Mail, {
-                    type: 'email', placeholder: 'jane@student.com', value: form.email,
+                    type: 'email', placeholder: 'Email address', value: form.email,
                     onChange: (e) => setForm({ ...form, email: e.target.value }), required: true,
                   })}
                 </div>
                 <div>
                   <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/60">
-                    Student ID <span className="font-normal normal-case tracking-normal text-white/35">(optional)</span>
+                    Student ID
                   </label>
                   {field(Contact, {
-                    type: 'text', placeholder: 'STU007', value: form.studentId,
+                    type: 'text', placeholder: 'Student ID', value: form.studentId,
                     onChange: (e) => setForm({ ...form, studentId: e.target.value }),
                   })}
                 </div>
@@ -109,14 +104,14 @@ export default function Register() {
                   <div>
                     <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/60">Password</label>
                     {field(Lock, {
-                      type: 'password', placeholder: 'Min. 6 characters', value: form.password,
+                      type: 'password', placeholder: 'Password', value: form.password,
                       onChange: (e) => setForm({ ...form, password: e.target.value }), minLength: 6, required: true,
                     })}
                   </div>
                   <div>
                     <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/60">Confirm</label>
                     {field(Lock, {
-                      type: 'password', placeholder: 'Repeat password', value: form.confirm,
+                      type: 'password', placeholder: 'Confirm password', value: form.confirm,
                       onChange: (e) => setForm({ ...form, confirm: e.target.value }), required: true,
                     })}
                   </div>
@@ -132,9 +127,6 @@ export default function Register() {
                 <Link to="/login" className="font-semibold text-indigo-300 transition hover:text-indigo-200">Sign in</Link>
               </p>
 
-              <div className="mt-6 flex items-center justify-center gap-2 text-xs text-white/40">
-                <CheckCircle2 className="h-3.5 w-3.5" /> Your data stays private and secure
-              </div>
             </div>
           </div>
         </div>
